@@ -1,4 +1,6 @@
-﻿using Spectre.Console;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Query;
+using Spectre.Console;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -32,22 +34,91 @@ namespace ConsoleAppContacts
 
         internal static void DeleteContact()
         {
-            throw new NotImplementedException();
+            ReadContacts();
+            var contactID = AnsiConsole.Ask<int>("What's the contact you want to remove's id?");
+            using (var context = new ContactsContext())
+            {
+                try
+                {
+                    var contactToRemove = context.Contacts.Single(c => c.Id == contactID);
+                    context.Contacts.Remove(contactToRemove);
+                    context.SaveChanges();
+                }
+                catch(InvalidOperationException)
+                {
+                    Console.WriteLine("Invalid id entered");
+                }
+            }
         }
 
-        internal static void EmailContact()
-        {
-            throw new NotImplementedException();
-        }
 
         internal static void UpdateContact()
         {
-            throw new NotImplementedException();
+            ReadContacts();
+            var contactID = AnsiConsole.Ask<int>("What's the contact you want to update's id?");
+            using (var context = new ContactsContext())
+            {
+                Contact contactToUpdate = new Contact();
+                try
+                {
+                    var contact = context.Contacts.Single(c => c.Id == contactID);
+                    contactToUpdate = contact;
+
+                }
+                catch (InvalidOperationException) { Console.WriteLine("Invalid Id entered"); return; }
+                var choice = AnsiConsole.Prompt(
+                new SelectionPrompt<string>()
+                    .Title("Which field")
+                    .PageSize(10)
+                    .AddChoices(new[] {
+                        "First Name", "Last Name", "Email",
+                        "Phone Number","Quit"
+                    }));
+                while (choice != "Quit")
+                {
+
+                    switch (choice)
+                    {
+                        case "First Name":
+                            var newFname = AnsiConsole.Ask<string>("Enter new [green]first name[/]?");
+                            contactToUpdate.FirstName = newFname;
+                            break;
+                        case "Last Name":
+                            var newLname = AnsiConsole.Ask<string>("Enter new [green]last name[/]?");
+                            contactToUpdate.LastName = newLname;
+                            break;
+                        case "Email":
+                            var newEmail = AnsiConsole.Ask<string>("Enter new [green]email[/]?");
+                            contactToUpdate.Email = newEmail;
+                            break;
+                        case "Phone Number":
+                            var newPhoneNum = AnsiConsole.Ask<string>("Enter new [green]phone number[/]?");
+                            contactToUpdate.PhoneNumber = newPhoneNum;
+                            break;
+                        default:
+                            break;
+                    }
+                    context.SaveChanges();
+
+                    choice = AnsiConsole.Prompt(
+                    new SelectionPrompt<string>()
+                        .Title("Which field")
+                        .PageSize(10)
+                        .AddChoices(new[] {
+                                "First Name", "Last Name", "Email",
+                                "Phone Number","Quit"
+                        }));
+                }
+            }
+
         }
+        
+    
 
         internal static void ReadContacts()
         {
             Table table = new Table();
+            table.AddColumn("ContactID");
             table.AddColumn("First Name");
             table.AddColumn("Last Name");
             table.AddColumn("Email");
@@ -57,7 +128,7 @@ namespace ConsoleAppContacts
                 var contactList = context.Contacts.ToList();
                 foreach(Contact currContact in contactList)
                 {
-                    table.AddRow(currContact.FirstName, currContact.LastName, currContact.Email, currContact.PhoneNumber);
+                    table.AddRow(currContact.Id.ToString(),currContact.FirstName, currContact.LastName, currContact.Email, currContact.PhoneNumber);
                 }
             }
             AnsiConsole.Write(table);

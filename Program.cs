@@ -16,7 +16,7 @@ namespace ConsoleAppContacts
                 .PageSize(10)
                 .AddChoices(new[] {
                     "Add Contact", "Update Contact", "Delete Contact",
-                    "Email Contact", "Quit"
+                    "Read Contacts", "Quit"
                 }));
             return choice;
         }
@@ -41,8 +41,8 @@ namespace ConsoleAppContacts
                     case "Delete Contact":
                         ContactController.DeleteContact();
                         break;
-                    case "Email Contact":
-                        ContactController.EmailContact();
+                    case "Read Contacts":
+                        ContactController.ReadContacts();
                         break;
                     default:
                         return;
