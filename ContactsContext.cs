@@ -11,7 +11,7 @@ namespace ConsoleAppContacts
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            string connectionString = ConfigurationManager.AppSettings["connectionString"];
+            string connectionString = Environment.GetEnvironmentVariable("ConnectionString");
             optionsBuilder.UseSqlServer(connectionString);
         }
     }

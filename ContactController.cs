@@ -133,5 +133,26 @@ namespace ConsoleAppContacts
             }
             AnsiConsole.Write(table);
         }
+
+        async internal static void SendEmail()
+        {
+            ReadContacts();
+            using (var context = new ContactsContext())
+            {
+                var contactID = AnsiConsole.Ask<int>("What's the id of the contact you want to email?");
+                Contact contactToEmail = new Contact();
+                try
+                {
+                    var contact = context.Contacts.Single(c => c.Id == contactID);
+                    contactToEmail = contact;
+
+                }
+                catch (InvalidOperationException) { Console.WriteLine("Invalid Id entered"); return; }
+                var myName = AnsiConsole.Ask<string>("What's the name you want to send your email as?");
+                var subject = AnsiConsole.Ask<string>("Enter the email's subject: ");
+                var body = AnsiConsole.Ask<string>("Enter the email body: ");
+                await EmailSend.SendEmail(myName,contactToEmail.Email,contactToEmail.FirstName,subject,body);
+            }
+        }
     }
 }
