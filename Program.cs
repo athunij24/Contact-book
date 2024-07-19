@@ -1,9 +1,4 @@
-﻿using Microsoft.VisualBasic;
-using Spectre.Console;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.Design;
-using System.Reflection.Metadata;
-using System.Xml.Serialization;
+﻿using Spectre.Console;
 namespace ConsoleAppContacts
 {
     class Program
